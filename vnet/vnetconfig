@@ -1,0 +1,30 @@
+provider "azurerm" {
+  alias = "secondary"
+  features {}
+
+  subscription_id = "e79d92eb-a2dc-4b0c-935c-938da2f92f5a"
+  client_id       = "308f12ca-9f47-4913-98c8-15330311cb31"
+  client_secret   = "d1_8Q~jzK2lbshSITDmPktIOq_Q1mw.fBf0rUcd."
+  tenant_id       = "51709080-e5b9-4abe-a516-7979534c09a6"
+}
+
+# Use an existing Azure Resource Group (replace with your existing resource group details)
+data "azurerm_resource_group" "existing_rg" {
+  name = "myResourceGroup"  # Replace with your existing resource group name
+}
+
+# Create a Virtual Network in the existing Resource Group
+resource "azurerm_virtual_network" "example_vnet" {
+  name                = "myVnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = data.azurerm_resource_group.existing_rg.location
+  resource_group_name = data.azurerm_resource_group.existing_rg.name
+}
+
+# Create a Subnet within the Virtual Network
+resource "azurerm_subnet" "example_subnet" {
+  name                 = "mySubnet"
+  resource_group_name   = data.azurerm_resource_group.existing_rg.name
+  virtual_network_name  = azurerm_virtual_network.example_vnet.name
+  address_prefixes      = ["10.0.1.0/24"]
+}
